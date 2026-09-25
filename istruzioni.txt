@@ -1,0 +1,105 @@
+//PYTHIA
+// testato con Pythia 8.309
+// fare i seguenti comandi separatamente
+
+1)            cd Esame_programmazione_avanzata/pythia
+2)            PYTHIA8PATH=/usr/local/pythia8309 
+3)            LD_LIBRARY_PATH=PYTHIA8PATH/lib:$LD_LIBRARY_PATH
+4)            make simulazione01
+5)            ./simulazione01
+//Si simulano tre collisioni: fotone-fotone 200 GeV, fotone-Oro 200 GeV e fotone-Oro 1 GeV. 
+// Chi avvia il programma sceglie quale collisione fare, il numero di eventi e decide anche il nome dei tre file creati (si consigliano i  nomi riportati qui sotto in modo d'avere coerenza con il programma di python creato per l'analisi)
+//Se si vuole fare la prima siluazione le risposte sono le seguenti:
+
+
+1
+100000
+pT1.txt theta1.txt  phi1.txt
+
+
+// se si vuole fare la seconda:
+
+2
+100000
+pT2.txt theta2.txt  phi2.txt
+
+// se si vuole fare la terza:
+
+3
+100000
+pT3.txt theta3.txt  phi3.txt
+
+//per l'analisi  basta imporre i comandi (questo sulla macchina virtuale, sul mio computer per esempio il comando è py o in altri python, dipende da dove si fa girare il programma):
+
+python3 Analisipythia1.py
+python3 Analisipythia2.py
+python3 Analisipythia3.py
+
+NOTA: non so per quale motivo ma sulla macchina virtuale il programma non parte subito credo dipende dall'aggiornamento fatto di numpy che entra in conflitto con matplot, quindi se i programmi si fanno girare sul proprio computer non dovrebbe esserci problemi se invece si fa girare sulla macchina virtuale prima di lanciare il programma si manda il comando:
+
+pip install 'numpy<2' 
+
+Fatto questo non ci dovrebbero essere problemi.
+
+// Se si vuole semplicemente testare la riuscita del programma pythia consiglio di impostare invece di 100000 eventi 1000, in modo tale la simulazione sarà molto rapida!
+// In più se si scegli questa strada ho creato una cartella denominata Analisi in cui ci sono i risultati delle simulazioni fatte da me e dove sono riportati i programmi in python che si possono aprire imponendo i seguenti comandi (vale sempre la Nota scritta sopra):
+
+cd Analisi
+python3 Analisipythia1.py
+python3 Analisipythia2.py 
+python3 Analisipythia3.py
+
+// Sottolineo che nella cartella sono presenti già i grafici prodotti dai programmi!
+// inotre nelle cartelle sono presenti anche dei file:
+
+pT4.txt theta4.txt  phi4.txt
+
+//Questa simulazione aggiuntiva con energia impostata a 10 GeV è stata realizzata per verificare se l’anomalia osservata nella simulazione 3 (condotta a 1 GeV) — in cui si riscontrano moltissimi eventi con impulso trasverso prossimo a zero — fosse dovuta a un errore nel programma o piuttosto a un limite fisico legato all’energia troppo bassa.
+//Dall’analisi dello spettro dell’impulso trasverso ottenuto a 10 GeV si nota un comportamento molto più coerente con le aspettative, suggerendo che il problema sia effettivamente legato all’energia troppo bassa. Inoltre, consultando la documentazione ufficiale di Pythia, si osserva che le simulazioni a energie di pochi GeV possono risultare poco affidabili: generalmente, infatti, si lavora con energie dell’ordine di alcune decine di GeV o superiori.
+
+// Un'altra osservazione da fare è sulla normalizzazione degli istogrammi di pt, facendo con python e imponendo density= True si osserva che l'asse delle y supera l'unità questo perchè per definizione della funzione attiva si divide per la larghezza dei vari bin quindi la probabilità è rapresentana dall'area della singola colonnina quindi per ottenerla bisogna fare base(larghezza del bin sull'asse x)*altezza(valore raggiunto sull'asse delle y). se invece si vuole rappresentata direttamente sull'asse y bisogna implementarla a mano con il metodo che invece è automatico in root e nella stessa pythia. Per avere la certezza ho creato un programma root in cui normalizza questi istogrammi. Questo si può aprire tramite i seguenti comandi:
+
+source /etc/profile.d/thisroot.sh
+thisroot
+root -l
+.x compareHistograms.C
+
+// Una volta nell'interfaccia di Root per uscirne basta .q.
+//Inoltre ho anche fatto una simulazione di pythia (che si avvia con simulazione02 impostando i comandi scritti per simulazione01) che mi creasse direttamente l'istogramma normalizzato o meglio che mi facesse uscire il file .txt da graficare, per farlo ho creato un programma in python che si può ricchiamare:
+
+python3 Analisipythia4.py
+
+// concludo dicendo  che tutti danno tutti risultati comparabili.
+//-----------------------------------------------------------------------------------------------------------------------------------//
+//per Geant4
+// testato con Geant4 11.4.0
+1)                        cd Esame_programmazione_avanzata/geant4/B1
+2)                        source /usr/local/geant4/bin/geant4.sh
+3)                        cd build
+4)                        cmake -DGeant4_DIR=/usr/local/geant4/lib/cmake/Geant4/ ../../B1
+5)                        make B1
+6)                        ./exampleB1
+
+// una volta nell'interfaccia grafica imporre per la simulazione automatica a 10 MeV il seguente comando:
+
+/run/beamOn 100000
+
+//Questo è quello che io ho impostato per l'analisi
+//Mentre per mandare le macro costruite all'interno per le energie di 2 Mev e 6 Mev impostare i seguenti comandi nell'interfaccia grafica:
+/control/execute run_2Mev.mac
+/control/execute run_6Mev.mac
+
+NOTA anche nelle macro sono impostate 100000 simulazioni
+
+// per mandare il programma di analisi svolta si deve prima bisogna uscire da build e poi mandare il programma come qui di seguito:
+
+cd ..
+python3 AnalisiG4_1.py
+
+NOTA: nella macro sono impostate 100000 simulazioni, quindi se si vuole testare solo il programma con le sue macro bisogna cambiare questi valori, anche in questo caso all'interno c'è una cartella chiamata Analisi in cui si trovano i file .txt creati dalle mie simulazioni che si possono usare per teste i programmi di analisi
+per accedervi si impostano i seguenti comandi:
+cd Analisi
+python3 AnalisiG4_1.py
+
+// Ho fatto un'unico programma che genera diversi grafici, i primi si creano in un ciclo, poi faccio un grafico per comparare dose ed energia e dose al tessuto sano limitrofo con dose al tumore. Nel mentre sul pront si stampano quante righe sbagliate nel file ci sono. Inoltre viene creato un file .txt in cui si stampano i risultati calcolati di dose. 
+
