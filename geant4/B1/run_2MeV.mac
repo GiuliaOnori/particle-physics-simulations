@@ -1,0 +1,26 @@
+# Macro file for example B1
+# Metto tutte e tre le richieste nella seguente macro tanto cambia solo il bean ma geometria analoga per tutte e tre
+# Can be run in batch, without graphic
+# or interactively: Idle> /control/execute run_sim.mac
+#
+# Change the default number of workers (in multi-threading mode) 
+#/run/numberOfThreads 4
+#
+# Initialize kernel
+/run/initialize
+#serie di comandi
+/control/verbose 0
+/run/verbose 0
+/event/verbose 0
+/tracking/verbose 0
+# Prima simulazione
+# gamma 2 MeV to the direction (0.,-1,0)
+#
+/gun/particle gamma
+/gun/energy 2 MeV
+#
+/run/beamOn 100000
+# 
+# 
+# 
+
